@@ -288,7 +288,7 @@ let contractABI = [
 ]
 let contract;
 
-let resolverContractAddress = "0x5FfC014343cd971B7eb70732021E26C35B744cc4"
+let resolverContractAddress = "0x9C4c3B509e47a298544d0fD0591B47550845e903"
 let resolverABI = [
 	{
 		"constant": true,
@@ -760,6 +760,12 @@ async function getLabels(){
 
 
 async function getTokenDetails() {
+
+	nameLabel.innerHTML = "Name: ";
+	symbolLabel.innerHTML = "Symbol: "
+	supplyLabel.innerHTML = "Total Supply: "
+	contractLink.innerHTML = "Contract: "
+	balanceLabel.innerHTML = "Balance: "
 	nameLabel.innerHTML += await contract.name()
 	symbolLabel.innerHTML += await contract.symbol()
 
@@ -786,7 +792,12 @@ async function getBalance(){
 
 async function transfer() {
 	let to = document.getElementById("transferTo").value
+	to = await resolve(to)
+	console.log(to)
 	let amount = parseAmount(document.getElementById("transferAmount").value)
+	let overrides = {
+		gasLimit:230000
+	}
 	await contract.transfer(to,amount)
 }
 
@@ -904,4 +915,10 @@ async function updateToken(){
 	contractAddress = await resolverContract.addr(namehash)
  	console.log(contractAddress)
 	initialize(web3)
+}
+
+async function resolve(ensName){
+		let nameHash = utils.namehash(ensName)
+		let address = await resolverContract.addr(nameHash)
+		return address
 }
