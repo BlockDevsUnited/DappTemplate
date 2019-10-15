@@ -792,13 +792,13 @@ async function getBalance(){
 
 async function transfer() {
 	let to = document.getElementById("transferTo").value
-	to = await resolve(to)
+	to = await resolveAddress(to)
 	console.log(to)
 	let amount = parseAmount(document.getElementById("transferAmount").value)
 	let overrides = {
 		gasLimit:230000
 	}
-	await contract.transfer(to,amount)
+	await contract.transfer(to,amount,overrides)
 }
 
 async function approve() {
@@ -909,16 +909,17 @@ function getNetwork() {
 }
 
 async function updateToken(){
-	let ENSAddress = document.getElementById("tokenAddress").value;
-	console.log(ENSAddress)
-	let namehash = utils.namehash(ENSAddress)
-	contractAddress = await resolverContract.addr(namehash)
+	contractAddress = await resolveAddress(document.getElementById("tokenAddress").value);
  	console.log(contractAddress)
 	initialize(web3)
 }
 
-async function resolve(ensName){
-		let nameHash = utils.namehash(ensName)
-		let address = await resolverContract.addr(nameHash)
-		return address
+async function resolveAddress(ensName){
+		if (ensName.includes(".")){
+			console.log(ensName)
+			let nameHash = utils.namehash(ensName)
+			ensName = await resolverContract.addr(nameHash)
+		}
+
+		return ensName
 }
